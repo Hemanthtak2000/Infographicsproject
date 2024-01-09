@@ -1,0 +1,113 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from jupyterthemes import jtplot
+jtplot.style(theme='solarizedl', context='notebook', ticks=True, grid=False)
+
+df1=pd.read_csv('Details.csv')
+df2=pd.read_csv('Orders.csv')
+df = pd.merge(df1, df2, on='Order ID', how='left')
+df['Order Date'] = pd.to_datetime(df['Order Date'], format="%d-%m-%Y")
+agg_df = df.groupby('Order Date').agg({
+    'Profit': 'sum',
+    'Amount': 'sum',
+    'Quantity': 'sum'
+}).reset_index()
+State_df = df.groupby('State').agg({
+    'Profit': 'sum',
+    'Amount': 'sum',
+    'Quantity': 'sum'
+}).reset_index()
+State_df = df.groupby('State').agg({
+    'Profit': 'sum',
+    'Amount': 'sum',
+    'Quantity': 'sum'
+}).reset_index()
+
+fig, axs = plt.subplots(2, 3, figsize=(15,9),tight_layout={'w_pad': 1.0})
+axs[0, 0].plot(agg_df['Order Date'], agg_df['Profit'], label='Profit', color='g')
+axs[0,0].scatter(agg_df['Order Date'], agg_df['Profit'], color='g')
+axs[0,0].plot(agg_df['Order Date'], agg_df['Amount'], label='Amount', color='purple')
+axs[0,0].scatter(agg_df['Order Date'], agg_df['Amount'], color='purple')
+axs[0,0].set_title('Total Profit and Amount Generated per Day')
+axs[0,0].set_xlabel('Order Date')
+axs[0,0].set_ylabel('Money Generated')
+axs[0,0].legend()
+
+#plot axs[0,1]
+axs[0,1].bar(State_df['State'], State_df['Quantity'], color=(65/255, 198/255, 191/255, 0.7))
+axs[0,1].set_title('Total Quantity Sold')
+axs[0,1].set_xlabel('State')
+axs[0,1].set_ylabel('Quantity')
+axs[0,1].set_xticklabels(State_df['State'], rotation=90)
+
+#plot axs[1,0]
+
+axs[1,0].plot(State_df['State'], State_df['Profit'], marker='o', color=(255/255, 0, 0, 0.8), label='Total Profit')
+axs[1,0].plot(State_df['State'], State_df['Amount'], marker='o', color=(130/255, 128/255, 7/255, 0.8), label='Total Amount')
+axs[1,0].set_title('Total Profit and Amount')
+axs[1,0].set_xlabel('State')
+axs[1,0].set_ylabel('Money')
+axs[1,0].set_xticklabels(State_df['State'], rotation=90)
+axs[1,0].legend()
+
+#plot axs[1,1]
+city = df.groupby('City')['Profit'].sum().reset_index()
+top10_city = city.nsmallest(10, 'Profit')
+axs[1,1].bar(top10_city['City'], top10_city['Profit'], color='skyblue')
+axs[1,1].set_title('Lowest Profits Generated from 10 Cities')
+axs[1,1].set_xlabel('City')
+axs[1,1].set_ylabel('Profit')
+axs[1,1].set_xticklabels(top10_city['City'],rotation=90)  # Rotate x-axis labels for better readability
+
+fig.delaxes(axs[0, 2])
+fig.delaxes(axs[1, 2])
+
+fig.text(0.67, 0.2,
+'''A sale of products over
+a digital platform has
+become a common trend
+in the Indian market.
+In order to justify
+the online selling
+of the product, this
+dataset has been
+chosen for visua-
+lization from public
+domain Kaggle.com.
+Based-on the obtai-
+ned result of four
+visuals, it has been
+found that more prod-
+ucts are sold online
+in comparison to the
+profit generation.
+Likewise, few states
+like Madhya Pradesh
+and Maharashtra were
+found to be at optimum
+position where the
+products are sold onl-
+ine more than other
+states. The total pro-
+fit made by different
+states in online prod-
+ucts was expectedly
+low against its amount.
+Hyderabad and Jaipur
+were two Indian states
+whose profit generation
+were found to be least
+among all the states.
+'''
+, fontsize=9, fontweight='light', fontfamily='serif')
+
+fig.text(0.67, 0.90,
+'''Student id: 22073706 
+Name : Hemanth Tak'''
+, fontsize=11, fontweight='light', fontfamily='serif')
+
+# Show plot
+plt.show()
+# plt.savefig('22073706',dpi=300)
